@@ -107,6 +107,54 @@ export type PromoTone = {
   chipInk: string;
 };
 
+/**
+ * The promo cards do NOT invert with the theme.
+ *
+ * They are brand artwork sitting on the surface, not part of it -- the same
+ * reason a photograph is not re-tinted in dark mode. Deepening them for dark
+ * previously dragged the ink down with the background and left the amber
+ * card's footnote at roughly 1.6:1, which is unreadable.
+ *
+ * Every gradient here is dark enough that near-white ink clears 4.5:1 against
+ * its lighter end, so one set of inks is legible on all three cards.
+ */
+export const PROMO_TONES = {
+  green: {
+    from: '#157A38',
+    to: '#06451C',
+    glow: '#3FCB75',
+    ink: '#F1FBF4',
+    inkStrong: '#FFFFFF',
+    inkMuted: '#DCF0E3',
+    chipBorder: '#5FD98C',
+    chipInk: '#F1FBF4',
+  },
+  // Deeper than the mock's swatch, and not negotiable: at #DE7C16 even pure
+  // white lands at 3.0:1, so the footnote on this card cannot be read. The
+  // lighter gradient end has to sit near L=0.15 for near-white ink to clear
+  // 4.5:1, which is what these values are solved for.
+  amber: {
+    from: '#A85510',
+    to: '#6E340A',
+    glow: '#E8912B',
+    ink: '#FFF6EC',
+    inkStrong: '#FFFFFF',
+    inkMuted: '#FFF0E0',
+    chipBorder: '#F7C58F',
+    chipInk: '#FFF6EC',
+  },
+  blue: {
+    from: '#2570BC',
+    to: '#0E3D7E',
+    glow: '#5AA6E8',
+    ink: '#EFF6FE',
+    inkStrong: '#FFFFFF',
+    inkMuted: '#EDF4FE',
+    chipBorder: '#A3CFF5',
+    chipInk: '#EFF6FE',
+  },
+} as const satisfies Record<string, PromoTone>;
+
 export type ThemePalette = {
   /** App background, behind everything. */
   background: string;
@@ -186,38 +234,7 @@ const light: ThemePalette = {
 
   shadow: '#0E1A10',
 
-  promo: {
-    green: {
-      from: '#1E9E4A',
-      to: '#0B6B2C',
-      glow: '#54D67E',
-      ink: '#E4F7E8',
-      inkStrong: '#FFFFFF',
-      inkMuted: '#B9E3C5',
-      chipBorder: '#6ADB90',
-      chipInk: '#DFF6E5',
-    },
-    amber: {
-      from: '#F5A524',
-      to: '#E06D1B',
-      glow: '#FFD37A',
-      ink: '#FFF3DF',
-      inkStrong: '#FFFFFF',
-      inkMuted: '#FBDCB0',
-      chipBorder: '#FFC96B',
-      chipInk: '#FFF1DA',
-    },
-    blue: {
-      from: '#2E8AE0',
-      to: '#1350A8',
-      glow: '#7CC2F5',
-      ink: '#E3F1FE',
-      inkStrong: '#FFFFFF',
-      inkMuted: '#B3D6F5',
-      chipBorder: '#6FBBF2',
-      chipInk: '#DEEFFE',
-    },
-  },
+  promo: PROMO_TONES,
 };
 
 const dark: ThemePalette = {
@@ -249,38 +266,8 @@ const dark: ThemePalette = {
 
   shadow: '#000000',
 
-  promo: {
-    green: {
-      from: '#0E7538',
-      to: '#053F19',
-      glow: '#2E9E52',
-      ink: '#CDEBD6',
-      inkStrong: '#F2FBF4',
-      inkMuted: '#8DBF9C',
-      chipBorder: '#2F7A45',
-      chipInk: '#AEDCBC',
-    },
-    amber: {
-      from: '#B9761A',
-      to: '#7A3F0F',
-      glow: '#D9932E',
-      ink: '#F6E3C8',
-      inkStrong: '#FDF4E6',
-      inkMuted: '#C9A778',
-      chipBorder: '#8A5A1D',
-      chipInk: '#E4C79A',
-    },
-    blue: {
-      from: '#1D5FA0',
-      to: '#0C2E63',
-      glow: '#3E8CD1',
-      ink: '#D2E6F9',
-      inkStrong: '#EEF6FE',
-      inkMuted: '#8FB4D6',
-      chipBorder: '#26608F',
-      chipInk: '#BCD9F2',
-    },
-  },
+  // Same artwork as light -- see PROMO_TONES.
+  promo: PROMO_TONES,
 };
 
 export const Palettes = { light, dark } as const;

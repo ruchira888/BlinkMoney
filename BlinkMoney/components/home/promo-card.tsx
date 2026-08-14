@@ -53,7 +53,10 @@ function PromoCardComponent({ promo, width, colors, onPress }: Props) {
             <Stop offset="1" stopColor={tone.to} />
           </LinearGradient>
           <RadialGradient id={`glow-${promo.id}`} cx="0.5" cy="0.5" r="0.5">
-            <Stop offset="0" stopColor={tone.glow} stopOpacity={0.55} />
+            {/* Kept low on purpose: the ink contrast above is solved against
+                the gradient's lighter end, and a strong bloom would lift the
+                background past that and undo it. */}
+            <Stop offset="0" stopColor={tone.glow} stopOpacity={0.3} />
             <Stop offset="1" stopColor={tone.glow} stopOpacity={0} />
           </RadialGradient>
         </Defs>
