@@ -105,58 +105,58 @@ export type PromoTone = {
   /** Outline chips sitting on the card. */
   chipBorder: string;
   chipInk: string;
+  /** Translucent white fill behind a chip, as in the reference art. */
+  chipBg: string;
 };
 
 /**
  * The promo cards do NOT invert with the theme.
  *
  * They are brand artwork sitting on the surface, not part of it -- the same
- * reason a photograph is not re-tinted in dark mode. Deepening them for dark
- * previously dragged the ink down with the background and left the amber
- * card's footnote at roughly 1.6:1, which is unreadable.
+ * reason a photograph is not re-tinted in dark mode.
  *
- * Every ink here is pure #FFFFFF. Tinted off-whites were what made the type
- * read as faded -- at these sizes the tint is not perceived as colour, only as
- * a loss of crispness. Hierarchy comes from size and weight instead, which is
- * why inkMuted is also white rather than a dimmer shade.
- *
- * Every gradient is dark enough that pure white clears 4.5:1 against its
- * lighter end, measured with the decorative bloom blended on top -- the bloom
- * lightens the ground, so ignoring it overstates the real contrast.
+ * Colours match the supplied reference art: bright, saturated gradients with
+ * large bold pure-white type. This is a deliberate brand choice over a
+ * measured one. White on these grounds runs 1.8:1 to 3.2:1, below WCAG AA,
+ * and no ink colour fixes that without darkening the cards away from the
+ * reference. It is survivable here because every string on these cards is
+ * large and bold, and none of it is the only place its information appears --
+ * but do not copy this palette onto small or body text elsewhere in the app.
  */
+
 export const PROMO_TONES = {
   green: {
-    from: '#157A38',
-    to: '#06451C',
-    glow: '#3FCB75',
+    from: '#8FD64A',
+    to: '#3EA83B',
+    glow: '#B6F07A',
     ink: '#FFFFFF',
     inkStrong: '#FFFFFF',
     inkMuted: '#FFFFFF',
-    chipBorder: '#7FE5A5',
+    chipBorder: 'rgba(255,255,255,0.45)',
     chipInk: '#FFFFFF',
+    chipBg: 'rgba(255,255,255,0.22)',
   },
-  // Brighter than it was, and it can afford to be: the bloom that used to sit
-  // over it at 0.3 opacity was washing every card out, and dropping that to
-  // 0.08 bought back more contrast than darkening the orange ever did.
   amber: {
-    from: '#B05C11',
-    to: '#7A3C0A',
-    glow: '#E8912B',
+    from: '#FFB13D',
+    to: '#EE7C17',
+    glow: '#FFD08A',
     ink: '#FFFFFF',
     inkStrong: '#FFFFFF',
     inkMuted: '#FFFFFF',
-    chipBorder: '#FFD5A8',
+    chipBorder: 'rgba(255,255,255,0.45)',
     chipInk: '#FFFFFF',
+    chipBg: 'rgba(255,255,255,0.22)',
   },
   blue: {
-    from: '#2570BC',
-    to: '#0E3D7E',
-    glow: '#5AA6E8',
+    from: '#7CC0F7',
+    to: '#3D93E6',
+    glow: '#B6DEFB',
     ink: '#FFFFFF',
     inkStrong: '#FFFFFF',
     inkMuted: '#FFFFFF',
-    chipBorder: '#B8DBF8',
+    chipBorder: 'rgba(255,255,255,0.45)',
     chipInk: '#FFFFFF',
+    chipBg: 'rgba(255,255,255,0.22)',
   },
 } as const satisfies Record<string, PromoTone>;
 

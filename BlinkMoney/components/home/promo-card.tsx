@@ -53,11 +53,10 @@ function PromoCardComponent({ promo, width, colors, onPress }: Props) {
             <Stop offset="1" stopColor={tone.to} />
           </LinearGradient>
           <RadialGradient id={`glow-${promo.id}`} cx="0.5" cy="0.5" r="0.5">
-            {/* 0.08, not 0.3. The bloom lightens the ground under white type,
-                and at 0.3 it dragged every card under 4.5:1 no matter how deep
-                the gradient was. This is the single value that decides whether
-                the copy reads as crisp or washed out. */}
-            <Stop offset="0" stopColor={tone.glow} stopOpacity={0.08} />
+            {/* Kept low. On these bright grounds the bloom is a gloss
+                highlight, not a light source -- pushed higher it flattens the
+                gradient and takes the remaining contrast out of the type. */}
+            <Stop offset="0" stopColor={tone.glow} stopOpacity={0.12} />
             <Stop offset="1" stopColor={tone.glow} stopOpacity={0} />
           </RadialGradient>
         </Defs>
@@ -67,7 +66,13 @@ function PromoCardComponent({ promo, width, colors, onPress }: Props) {
 
       <View style={styles.content}>
         {promo.eyebrow ? (
-          <Text style={[styles.eyebrow, { color: tone.inkMuted }]} numberOfLines={1}>
+          <Text
+            style={[
+              styles.eyebrow,
+              { color: tone.chipInk, backgroundColor: tone.chipBg, borderColor: tone.chipBorder },
+            ]}
+            numberOfLines={1}
+          >
             {promo.eyebrow}
           </Text>
         ) : null}
@@ -99,7 +104,10 @@ function PromoCardComponent({ promo, width, colors, onPress }: Props) {
 
         <View style={styles.chips}>
           {promo.chips.map((chip) => (
-            <View key={chip.id} style={[styles.chip, { borderColor: tone.chipBorder }]}>
+            <View
+              key={chip.id}
+              style={[styles.chip, { backgroundColor: tone.chipBg, borderColor: tone.chipBorder }]}
+            >
               <Text style={[styles.chipText, { color: tone.chipInk }]} numberOfLines={1}>
                 {chip.label}
               </Text>
@@ -130,17 +138,28 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: Spacing.xxl,
   },
+  // Rendered as a pill in the reference ("Exclusive for you"), so it carries
+  // its own chrome rather than sitting as bare text.
   eyebrow: {
-    ...Typography.caption,
+    ...Typography.micro,
     fontWeight: '700',
-    marginBottom: Spacing.xs,
+    overflow: 'hidden',
+    alignSelf: 'flex-start',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: Radius.pill,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    marginBottom: Spacing.md,
   },
   title: {
     ...Typography.title,
+    fontWeight: '800',
   },
+  // Upright and equally heavy. The reference sets both headline lines in the
+  // same weight; the italic serif treatment this used to have is not in it.
   titleAccent: {
     ...Typography.title,
-    fontStyle: 'italic',
+    fontWeight: '800',
   },
   rule: {
     height: StyleSheet.hairlineWidth,
@@ -163,6 +182,7 @@ const styles = StyleSheet.create({
   },
   statValue: {
     ...Typography.display,
+    fontWeight: '800',
   },
   statLabel: {
     ...Typography.micro,
