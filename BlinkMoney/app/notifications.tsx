@@ -1,8 +1,23 @@
+/**
+ * Notifications.
+ *
+ * Themed via a makeStyles factory memoised on the palette. StyleSheet.create
+ * runs at module scope, so a module-level `styles` object bakes in whichever
+ * theme was active at import and never repaints -- which is exactly why this
+ * screen stayed dark when the toggle was flipped.
+ */
+
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useMemo } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { PressableScale } from '@/components/ui/pressable-scale';
+import { ScreenHeader } from '@/components/ui/screen-header';
+import { Radius, Spacing, Typography, type ThemePalette } from '@/constants/theme';
+import { useTheme } from '@/providers/theme-provider';
 
 type Notification = {
   id: string;
@@ -10,7 +25,7 @@ type Notification = {
   title: string;
   body: string;
   when: string;
-  /** Gift notifications reveal the envelope when tapped. */
+  /** Gift notifications hand the whole screen over to the gift scene. */
   gift?: { value: string; caption: string };
 };
 
@@ -41,125 +56,93 @@ const NOTIFICATIONS: Notification[] = [
 
 export default function NotificationsScreen() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
+  const s = useMemo(() => makeStyles(colors), [colors]);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="light" />
-      <View style={styles.header}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-          onPress={() => router.back()}
-          style={styles.backButton}
-        >
-          <Ionicons name="chevron-back" size={24} color="#c6d0c4" />
-        </Pressable>
-        <Text style={styles.headerTitle}>Notifications</Text>
-      </View>
+    <SafeAreaView style={[s.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
+      {/* Rule 2: style only, no backgroundColor. */}
+      <StatusBar style={isDark ? 'light' : 'dark'} />
 
-      <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
+      <ScreenHeader title="Notifications" colors={colors} onBack={() => router.back()} />
+
+      <ScrollView contentContainerStyle={s.list} showsVerticalScrollIndicator={false}>
         {NOTIFICATIONS.map((item) =>
           item.gift ? (
-            <GiftNotification key={item.id} item={item} />
+            <PressableScale
+              key={item.id}
+              accessibilityRole="button"
+              accessibilityLabel={item.title}
+              accessibilityHint="Opens your gift"
+              onPress={() => router.push('/gift')}
+              haptic
+              style={[s.card, s.giftCard]}
+            >
+              <View style={s.cardRow}>
+                <View style={[s.iconCircle, s.giftIconCircle]}>
+                  <Ionicons name={item.icon} size={20} color={colors.accentInk} />
+                </View>
+                <View style={s.cardText}>
+                  <Text style={s.cardTitle}>{item.title}</Text>
+                  <Text style={s.cardBody}>{item.body}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color={colors.textFaint} />
+              </View>
+            </PressableScale>
           ) : (
-            <PlainNotification key={item.id} item={item} />
-          ),
+            <View key={item.id} style={s.card}>
+              <View style={s.cardRow}>
+                <View style={s.iconCircle}>
+                  <Ionicons name={item.icon} size={20} color={colors.textMuted} />
+                </View>
+                <View style={s.cardText}>
+                  <Text style={s.cardTitle}>{item.title}</Text>
+                  <Text style={s.cardBody}>{item.body}</Text>
+                </View>
+                <Text style={s.when}>{item.when}</Text>
+              </View>
+            </View>
+          )
         )}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-/**
- * A notification carrying a gift. Tapping it hands the whole screen over to
- * the gift scene, rather than expanding inline -- the envelope, the confetti
- * and the certificate are the moment, and a notification row is too small a
- * frame for it.
- */
-function GiftNotification({ item }: { item: Notification }) {
-  const router = useRouter();
-
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={item.title}
-      accessibilityHint="Opens your gift"
-      onPress={() => router.push('/gift')}
-      style={[styles.card, styles.giftCard]}
-    >
-      <View style={styles.cardRow}>
-        <View style={[styles.iconCircle, styles.giftIconCircle]}>
-          <Ionicons name={item.icon} size={22} color="#9ad584" />
-        </View>
-        <View style={styles.cardText}>
-          <Text style={styles.cardTitle}>{item.title}</Text>
-          <Text style={styles.cardBody}>{item.body}</Text>
-        </View>
-        <Ionicons name="chevron-forward" size={18} color="#6f7a6e" />
-      </View>
-    </Pressable>
-  );
+function makeStyles(colors: ThemePalette) {
+  return StyleSheet.create({
+    safeArea: { flex: 1 },
+    list: {
+      paddingHorizontal: Spacing.xl,
+      paddingBottom: Spacing.xxxl,
+      gap: Spacing.md,
+    },
+    card: {
+      borderRadius: Radius.lg,
+      backgroundColor: colors.surface,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      overflow: 'hidden',
+    },
+    giftCard: { borderColor: colors.accent },
+    cardRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: Spacing.md,
+      padding: Spacing.lg,
+    },
+    iconCircle: {
+      width: 42,
+      height: 42,
+      borderRadius: Radius.pill,
+      backgroundColor: colors.surfaceSunken,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    giftIconCircle: { backgroundColor: colors.accentWash },
+    cardText: { flex: 1, gap: Spacing.xxs },
+    cardTitle: { ...Typography.bodyStrong, color: colors.text },
+    cardBody: { ...Typography.caption, color: colors.textMuted },
+    when: { ...Typography.micro, color: colors.textFaint },
+  });
 }
-
-function PlainNotification({ item }: { item: Notification }) {
-  return (
-    <View style={styles.card}>
-      <View style={styles.cardRow}>
-        <View style={styles.iconCircle}>
-          <Ionicons name={item.icon} size={22} color="#c6d0c4" />
-        </View>
-        <View style={styles.cardText}>
-          <Text style={styles.cardTitle}>{item.title}</Text>
-          <Text style={styles.cardBody}>{item.body}</Text>
-        </View>
-        <Text style={styles.when}>{item.when}</Text>
-      </View>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#080b08' },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 8,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#101711',
-    borderWidth: 1,
-    borderColor: '#254024',
-  },
-  headerTitle: { color: '#e5e7e4', fontSize: 22, fontWeight: '700' },
-  list: { paddingHorizontal: 16, paddingBottom: 32, gap: 12 },
-  card: {
-    borderRadius: 18,
-    backgroundColor: '#0f150f',
-    borderWidth: 1,
-    borderColor: '#1d271d',
-    overflow: 'hidden',
-  },
-  giftCard: { borderColor: '#2f5b2c' },
-  cardRow: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 },
-  iconCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: '#141c14',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  giftIconCircle: { backgroundColor: '#123010' },
-  cardText: { flex: 1, gap: 3 },
-  cardTitle: { color: '#e2e6e0', fontSize: 15, fontWeight: '700' },
-  cardBody: { color: '#a4ada2', fontSize: 13, lineHeight: 18 },
-  when: { color: '#6f7a6e', fontSize: 11 },
-});
