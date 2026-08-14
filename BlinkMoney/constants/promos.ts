@@ -53,10 +53,12 @@ export const PROMOS: Promo[] = [
     titleAccent: 'SIP',
     body: 'No fund picking. No research. BlinkMoney allocates across multiple asset classes automatically.',
     stat: { value: '~15%', label: 'p.a. returns*' },
+    // Two, not three. A third wrapped to a second row and left the block
+    // cramped against the card's bottom edge; the dropped claim is the
+    // weakest of the three and is made again by the SIP calculator below.
     chips: [
       { id: 'amfi', label: 'AMFI registered' },
       { id: 'start', label: 'Start at ₹21/day' },
-      { id: 'compounding', label: 'Daily compounding' },
     ],
     footnote: '*T&C apply',
     cta: 'Start SIP',

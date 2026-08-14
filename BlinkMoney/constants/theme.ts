@@ -160,6 +160,31 @@ export const PROMO_TONES = {
   },
 } as const satisfies Record<string, PromoTone>;
 
+/**
+ * Translucent whites for glass treatments on coloured artwork.
+ *
+ * Separate from ThemePalette because these are not theme-dependent: they sit
+ * on the promo cards and gift cards, which do not invert, and they read as
+ * light passing over a surface rather than as a colour of their own.
+ */
+export const Glass = {
+  white: '#FFFFFF',
+  /** Top specular band on a card. */
+  sheen: 0.2,
+  /** Where that band has faded out. */
+  sheenFade: 0.02,
+  /** Hairline catching light on the card's edge. */
+  edge: 'rgba(255,255,255,0.3)',
+  /** Decorative rings. */
+  ring: 'rgba(255,255,255,0.22)',
+  ringSoft: 'rgba(255,255,255,0.13)',
+  /** Fill and outline for chips sitting on artwork. */
+  chipFill: 'rgba(255,255,255,0.2)',
+  chipEdge: 'rgba(255,255,255,0.42)',
+  /** Pressed-state veil. */
+  press: 'rgba(255,255,255,0.14)',
+} as const;
+
 export type ThemePalette = {
   /** App background, behind everything. */
   background: string;
