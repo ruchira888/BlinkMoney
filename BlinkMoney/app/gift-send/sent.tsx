@@ -9,14 +9,14 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
-import { Share, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Share, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { ConfettiBurst } from '@/components/gift-send/confetti-burst';
 import { GiftCardArt } from '@/components/gift-send/gift-card-art';
 import { PressableScale } from '@/components/ui/pressable-scale';
-import { GIFT_RECIPIENT } from '@/constants/gift-cards';
+import { GIFT_CARD_ASPECT, GIFT_RECIPIENT } from '@/constants/gift-cards';
 import { Duration, Radius, Spacing, Typography, elevation } from '@/constants/theme';
 import { formatRupees } from '@/lib/sip';
 import { useGiftDraft } from '@/providers/gift-draft-provider';
@@ -26,12 +26,12 @@ import * as Haptics from 'expo-haptics';
 /** Stand-in for the real short link the backend would mint. */
 const GIFT_LINK = 'https://blink.money/seed/7hk3';
 
+/** Small enough that the tick and the headline stay the focus. */
+const THUMB_WIDTH = 72;
+
 export default function GiftSentScreen() {
   const { colors, scheme } = useTheme();
   const { card, amount } = useGiftDraft();
-  const { width } = useWindowDimensions();
-
-  const cardWidth = Math.min(width - Spacing.xl * 2, 320);
 
   useEffect(() => {
     // Success is the one moment in the flow worth a notification-weight haptic.
@@ -67,8 +67,23 @@ export default function GiftSentScreen() {
           </Text>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(220).duration(Duration.slow)}>
-          <GiftCardArt design={card} width={cardWidth} height={116} amount={amount} compact />
+        <Animated.View
+          entering={FadeInDown.delay(220).duration(Duration.slow)}
+          style={styles.summary}
+        >
+          <GiftCardArt
+            design={card}
+            width={THUMB_WIDTH}
+            height={THUMB_WIDTH * GIFT_CARD_ASPECT}
+          />
+          <View style={styles.summaryText}>
+            <Text style={[styles.summaryAmount, { color: colors.accentInk }]}>
+              {formatRupees(amount)}
+            </Text>
+            <Text style={[styles.summaryCard, { color: colors.textMuted }]} numberOfLines={2}>
+              {card.title}
+            </Text>
+          </View>
         </Animated.View>
       </View>
 
@@ -114,6 +129,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   copy: { alignItems: 'center', gap: Spacing.sm },
+  summary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.lg,
+  },
+  summaryText: { gap: Spacing.xxs },
+  summaryAmount: { ...Typography.title },
+  summaryCard: { ...Typography.caption },
   title: { ...Typography.display },
   subtitle: { ...Typography.body, textAlign: 'center' },
   actions: {

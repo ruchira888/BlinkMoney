@@ -54,10 +54,11 @@ import Animated, {
 
 import { GiftCardArt } from '@/components/gift-send/gift-card-art';
 import { CarouselDots } from '@/components/home/carousel-dots';
-import type { GiftCardDesign } from '@/constants/gift-cards';
+import { GIFT_CARD_ASPECT, type GiftCardDesign } from '@/constants/gift-cards';
 import { Spacing, Typography, type ThemePalette } from '@/constants/theme';
 
-const CARD_ASPECT = 1.42;
+// Matches the artwork assets.
+const CARD_ASPECT = GIFT_CARD_ASPECT;
 /** Share of the screen the hero card occupies. Brief asks for 65-72%. */
 const SLOT_RATIO = 0.7;
 /** Gap between slots, so neighbours peek with air around them. */

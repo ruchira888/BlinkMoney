@@ -1,45 +1,25 @@
 /**
  * Gift card designs for the Gift a Seed send flow.
  *
- * Light pastel stock with dark ink, matching the reference artwork. Like the
- * promo cards these do not invert with the theme -- a gift card is artwork the
- * recipient receives, not app chrome, so it reads the same on either surface.
- *
- * Because the ink is dark here, the worst case is the *darkest* end of each
- * gradient rather than the lightest. Every ink below is verified against that
- * end: titles clear 6.7:1 and taglines clear 4.6:1 at minimum.
+ * The cards are artwork assets rather than something drawn in code, so a
+ * design change is a file swap, not a component edit. Title and tagline are
+ * baked into the image; they stay here only for the accessibility label and
+ * the picker's caption.
  */
 
-export type GiftCardTone = {
-  /** Gradient stops, top-left to bottom-right. */
-  from: string;
-  to: string;
-  /** Soft blooms behind the artwork. */
-  bloom: string;
-  /** Title ink. */
-  ink: string;
-  /** Tagline and body ink. */
-  inkMuted: string;
-  /** The hairline under the title. Ornamental. */
-  rule: string;
-  /** Motif tint. */
-  motif: string;
-};
+/** Height / width of the card assets. All three are within a hair of this. */
+export const GIFT_CARD_ASPECT = 1.62;
 
 export type GiftCardDesign = {
   id: string;
-  /** Shown on the card. */
+  /** Baked into the image; kept for screen readers. */
   title: string;
-  /** The line under the rule. */
+  /** Baked into the image; kept for screen readers. */
   tagline: string;
-  /** Shown under the card in the picker. */
+  /** Caption under the card in the picker. */
   occasion: string;
-  icon: string;
-  /** Ionicons has no cake glyph, so Birthday comes from MaterialCommunityIcons. */
-  iconFamily: 'ionicons' | 'material';
-  tone: GiftCardTone;
-  /** Confetti fleck colours, drawn as small rotated rects. */
-  confetti: string[];
+  /** require()d png. */
+  image: number;
 };
 
 export const GIFT_CARDS: GiftCardDesign[] = [
@@ -48,54 +28,21 @@ export const GIFT_CARDS: GiftCardDesign[] = [
     title: 'A New Beginning',
     tagline: 'For new dreams and big tomorrows.',
     occasion: 'Just Because',
-    icon: 'leaf',
-    iconFamily: 'ionicons',
-    tone: {
-      from: '#E9F7C9',
-      to: '#A9E6C6',
-      bloom: '#C8EFA8',
-      ink: '#14431C',
-      inkMuted: '#2A5D34',
-      rule: '#4E8C63',
-      motif: '#2E8B45',
-    },
-    confetti: ['#F5D93B', '#4CAF50', '#29B6D6', '#8BC34A'],
+    image: require('@/assets/images/card-new-beginning.png'),
   },
   {
     id: 'diwali',
     title: 'Diwali',
     tagline: 'A shagun for a brighter future.',
     occasion: 'Diwali',
-    icon: 'flame',
-    iconFamily: 'ionicons',
-    tone: {
-      from: '#F6A72A',
-      to: '#FDECB4',
-      bloom: '#FFC85E',
-      ink: '#4A2408',
-      inkMuted: '#6B3A12',
-      rule: '#A2701C',
-      motif: '#8A4A12',
-    },
-    confetti: ['#F5D93B', '#FF5722', '#E91E63', '#FFC107'],
+    image: require('@/assets/images/card-diwali.png'),
   },
   {
     id: 'birthday',
     title: 'Birthday',
     tagline: 'Celebrate a new chapter.',
     occasion: 'Birthday',
-    icon: 'cake-variant',
-    iconFamily: 'material',
-    tone: {
-      from: '#A9D9F6',
-      to: '#DCEEFC',
-      bloom: '#8FCBF2',
-      ink: '#12275A',
-      inkMuted: '#26406F',
-      rule: '#4A80B8',
-      motif: '#1B5E9E',
-    },
-    confetti: ['#E91E63', '#29B6D6', '#FFC107', '#7B4DFF'],
+    image: require('@/assets/images/card-birthday.png'),
   },
 ];
 

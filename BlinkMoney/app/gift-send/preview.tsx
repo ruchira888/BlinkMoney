@@ -1,9 +1,10 @@
 /**
  * Step 3 of 4: exactly what the recipient will see.
  *
- * Renders the same GiftCardArt the picker and the sent screen use, so this is
- * a real preview rather than a second implementation that can drift from what
- * actually gets sent.
+ * The card is the artwork asset, unmodified. The amount, message and sender
+ * are shown as rows beneath it rather than drawn on top -- the title and
+ * tagline are baked into the image, and overlaying more type on that would
+ * mean covering part of the artwork.
  */
 
 import { router } from 'expo-router';
@@ -13,12 +14,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FlowFooter } from '@/components/gift-send/flow-footer';
 import { GiftCardArt } from '@/components/gift-send/gift-card-art';
 import { ScreenHeader } from '@/components/ui/screen-header';
-import { GIFT_RECIPIENT, GIFT_SENDER } from '@/constants/gift-cards';
-import { Spacing, Typography } from '@/constants/theme';
+import { GIFT_CARD_ASPECT, GIFT_RECIPIENT, GIFT_SENDER } from '@/constants/gift-cards';
+import { Radius, Spacing, Typography } from '@/constants/theme';
+import { formatRupees } from '@/lib/sip';
 import { useGiftDraft } from '@/providers/gift-draft-provider';
 import { useTheme } from '@/providers/theme-provider';
-
-const CARD_ASPECT = 1.32;
 
 export default function GiftPreviewScreen() {
   const { colors, scheme } = useTheme();
@@ -26,7 +26,7 @@ export default function GiftPreviewScreen() {
   const { width } = useWindowDimensions();
 
   // Capped so the card does not become absurdly tall on a tablet.
-  const cardWidth = Math.min(width - Spacing.xl * 2, 320);
+  const cardWidth = Math.min(width - Spacing.xl * 2, 240);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
@@ -41,18 +41,40 @@ export default function GiftPreviewScreen() {
         <GiftCardArt
           design={card}
           width={cardWidth}
-          height={cardWidth * CARD_ASPECT}
-          amount={amount}
-          message={message || undefined}
-          sender={GIFT_SENDER}
+          height={cardWidth * GIFT_CARD_ASPECT}
         />
 
-        <View style={styles.note}>
-          <Text style={[styles.noteText, { color: colors.textMuted }]}>
-            The amount is invested as a daily SIP the moment {GIFT_RECIPIENT} claims it, so it
-            starts growing on day one.
-          </Text>
+        <View
+          style={[styles.details, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        >
+          <View style={styles.detailRow}>
+            <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Amount</Text>
+            <Text style={[styles.detailValue, { color: colors.accentInk }]}>
+              {formatRupees(amount)}
+            </Text>
+          </View>
+
+          {message ? (
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+          ) : null}
+          {message ? (
+            <View style={styles.messageBlock}>
+              <Text style={[styles.detailLabel, { color: colors.textMuted }]}>Your message</Text>
+              <Text style={[styles.message, { color: colors.text }]}>{message}</Text>
+            </View>
+          ) : null}
+
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
+          <View style={styles.detailRow}>
+            <Text style={[styles.detailLabel, { color: colors.textMuted }]}>From</Text>
+            <Text style={[styles.detailValue, { color: colors.text }]}>{GIFT_SENDER}</Text>
+          </View>
         </View>
+
+        <Text style={[styles.note, { color: colors.textMuted }]}>
+          The amount is invested as a daily SIP the moment {GIFT_RECIPIENT} claims it, so it starts
+          growing on day one.
+        </Text>
       </ScrollView>
 
       <FlowFooter
@@ -75,11 +97,32 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xxl,
     gap: Spacing.xl,
   },
-  note: {
-    paddingHorizontal: Spacing.md,
+  details: {
+    alignSelf: 'stretch',
+    borderRadius: Radius.lg,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: Spacing.lg,
   },
-  noteText: {
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: Spacing.lg,
+    gap: Spacing.md,
+  },
+  messageBlock: {
+    paddingVertical: Spacing.lg,
+    gap: Spacing.xs,
+  },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+  },
+  detailLabel: { ...Typography.caption },
+  detailValue: { ...Typography.subheading },
+  message: { ...Typography.body },
+  note: {
     ...Typography.caption,
     textAlign: 'center',
+    paddingHorizontal: Spacing.md,
   },
 });
