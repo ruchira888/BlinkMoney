@@ -29,7 +29,7 @@ const SCROLL_BOTTOM_PADDING = 108;
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { colors, scheme, isDark, toggle } = useTheme();
+  const { colors, scheme } = useTheme();
   const { state, retry } = usePromos();
 
   const [activePromo, setActivePromo] = useState(0);
@@ -61,16 +61,7 @@ export default function HomeScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <HomeHeader
-          name="User"
-          colors={colors}
-          scheme={scheme}
-          isDark={isDark}
-          onToggleTheme={toggle}
-          onPressNotifications={() => router.push('/notifications')}
-          onPressHelp={() => {}}
-          hasNotifications
-        />
+        <HomeHeader name="User" colors={colors} onPressHelp={() => {}} />
 
         <PromoSection
           state={state}

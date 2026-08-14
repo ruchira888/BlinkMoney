@@ -30,15 +30,6 @@ export const RECEIVED_GIFTS: ReceivedGift[] = [
     when: 'Just now',
     opened: false,
   },
-  {
-    id: 'r2',
-    sender: 'Meera',
-    cardId: 'diwali',
-    amount: 501,
-    message: 'A shagun to start something of your own.',
-    when: 'Last Diwali',
-    opened: true,
-  },
 ];
 
 export function findReceivedGift(id: string | undefined): ReceivedGift | undefined {
