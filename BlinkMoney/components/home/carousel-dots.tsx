@@ -80,7 +80,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: Spacing.sm,
-    height: Spacing.xxxl,
+    // Was xxxl. A full 32px band under the card was reading as a gap in the
+    // page rather than as the carousel's own indicator.
+    height: Spacing.xxl,
   },
   dot: {
     height: DOT_SIZE,

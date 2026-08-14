@@ -42,12 +42,17 @@ import { Glass, Radius, Spacing, Typography, type ThemePalette } from '@/constan
  * reserved exactly that height, so there was no tolerance for a long string or
  * a large system font before the card clipped.
  *
- * The floor keeps the tallest card's content (~271px) fitting on a narrow
+ * The ratio is landscape, matching the reference art. It only works because
+ * the copy is short enough to sit in two lines -- a card is only as wide and
+ * flat as its longest paragraph lets it be, so the copy was cut first and the
+ * proportion followed.
+ *
+ * The floor keeps the tallest card's content (~241px) fitting on a narrow
  * phone; the ceiling stops it becoming a slab on a tablet.
  */
-const CARD_RATIO = 0.78;
-const MIN_CARD_HEIGHT = 280;
-const MAX_CARD_HEIGHT = 320;
+const CARD_RATIO = 0.68;
+const MIN_CARD_HEIGHT = 250;
+const MAX_CARD_HEIGHT = 286;
 
 export function promoCardHeight(cardWidth: number): number {
   return Math.round(
@@ -192,7 +197,7 @@ function PromoCardComponent({ promo, width, colors, onPress }: Props) {
         <View style={styles.bodyRow}>
           <Text
             style={[styles.body, { color: tone.ink }]}
-            numberOfLines={3}
+            numberOfLines={2}
             maxFontSizeMultiplier={1.2}
           >
             {promo.body}
@@ -200,7 +205,7 @@ function PromoCardComponent({ promo, width, colors, onPress }: Props) {
           {promo.stat ? (
             <View style={styles.stat}>
               <Text style={[styles.statValue, { color: tone.inkStrong }]} maxFontSizeMultiplier={1.2}>{promo.stat.value}</Text>
-              <Text style={[styles.statLabel, { color: tone.inkMuted }]} numberOfLines={2}>
+              <Text style={[styles.statLabel, { color: tone.inkMuted }]} numberOfLines={1}>
                 {promo.stat.label}
               </Text>
             </View>
@@ -254,7 +259,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: Spacing.xl,
+    padding: Spacing.lg + 2,
   },
   // A pill in the reference ("Exclusive for you"), so it carries its own
   // chrome rather than sitting as bare text.
@@ -266,39 +271,45 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: Radius.pill,
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
-    marginBottom: Spacing.md,
+    paddingVertical: Spacing.xs - 1,
+    marginBottom: Spacing.sm + 2,
   },
+  // A step down from Typography.title. At the card's width the ramp size
+  // pushed every headline onto two lines and forced the card taller.
   title: {
-    ...Typography.title,
+    fontSize: 23,
+    lineHeight: 29,
     fontWeight: '800',
     letterSpacing: -0.3,
   },
   // Upright and equally heavy. The reference sets both headline lines in the
   // same weight; the italic serif treatment this used to have is not in it.
   titleAccent: {
-    ...Typography.title,
+    fontSize: 23,
+    lineHeight: 29,
     fontWeight: '800',
     letterSpacing: -0.3,
   },
   bodyRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: Spacing.lg,
-    marginTop: Spacing.md,
+    gap: Spacing.md,
+    marginTop: Spacing.sm + 2,
   },
   body: {
-    ...Typography.body,
+    fontSize: 14,
+    lineHeight: 20,
     fontWeight: '600',
     flex: 1,
     opacity: 0.94,
   },
   stat: {
     alignItems: 'center',
-    maxWidth: 96,
+    maxWidth: 104,
   },
   statValue: {
-    ...Typography.display,
+    fontSize: 30,
+    lineHeight: 36,
     fontWeight: '800',
     letterSpacing: -0.5,
   },

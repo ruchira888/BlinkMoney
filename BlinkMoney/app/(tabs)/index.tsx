@@ -90,6 +90,8 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingTop: Spacing.md,
-    gap: Spacing.xl,
+    // The carousel already carries its own indicator band underneath, so the
+    // section gap sits on top of that. lg keeps the rhythm even.
+    gap: Spacing.lg,
   },
 });

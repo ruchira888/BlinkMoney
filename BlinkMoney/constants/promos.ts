@@ -51,8 +51,8 @@ export const PROMOS: Promo[] = [
     eyebrow: 'Stocks + FD + Gold',
     title: 'All in one click',
     titleAccent: 'SIP',
-    body: 'No fund picking. No research. BlinkMoney allocates across multiple asset classes automatically.',
-    stat: { value: '~15%', label: 'p.a. returns*' },
+    body: 'No fund picking. We spread it across assets for you.',
+    stat: { value: '~15%', label: 'p.a. returns' },
     // Two, not three. A third wrapped to a second row and left the block
     // cramped against the card's bottom edge; the dropped claim is the
     // weakest of the three and is made again by the SIP calculator below.
@@ -68,7 +68,7 @@ export const PROMOS: Promo[] = [
     tone: 'amber',
     title: '10 Cr+',
     titleAccent: 'SIP accounts',
-    body: 'Crores of Indians are already investing daily. Every day you wait is a day of compounding missed.',
+    body: 'Crores invest daily. Every day you wait is compounding missed.',
     chips: [{ id: 'growth', label: 'SIP accounts grew ~35% last year' }],
     footnote: 'The wave has started. Yours hasn’t.',
     cta: 'Join them',
@@ -79,7 +79,7 @@ export const PROMOS: Promo[] = [
     eyebrow: 'Start your SIP',
     title: 'Reach ₹25,000',
     titleAccent: 'Unlock instant credit',
-    body: 'Invest and stay liquid. Borrow against your portfolio without breaking your SIP — ever.',
+    body: 'Borrow against your portfolio without breaking your SIP.',
     stat: { value: '9.99%', label: 'interest p.a.' },
     chips: [
       { id: 'no-check', label: 'Zero credit check' },
