@@ -18,8 +18,14 @@ import { Radius, Spacing, Typography, type ThemePalette } from '@/constants/them
 import type { Promo } from '@/constants/promos';
 
 /** Fixed so every slide is the same height and the carousel never reflows as
- *  it advances between cards with different amounts of copy. */
-export const PROMO_CARD_HEIGHT = 296;
+ *  it advances between cards with different amounts of copy.
+ *
+ *  Trimmed from 296. The vertical rhythm below was tightened by more than that
+ *  at the same time -- the green card's three chips wrap to two rows, and at
+ *  the old spacing the second row fell past the bottom edge and was clipped by
+ *  the card's overflow. A shorter card on its own would have clipped it
+ *  harder, so the space had to come out of the gaps, not the height. */
+export const PROMO_CARD_HEIGHT = 284;
 
 type Props = {
   promo: Promo;
@@ -136,7 +142,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: Spacing.xxl,
+    padding: Spacing.xl,
   },
   // Rendered as a pill in the reference ("Exclusive for you"), so it carries
   // its own chrome rather than sitting as bare text.
@@ -149,7 +155,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.pill,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   title: {
     ...Typography.title,
@@ -164,7 +170,7 @@ const styles = StyleSheet.create({
   rule: {
     height: StyleSheet.hairlineWidth,
     opacity: 0.5,
-    marginVertical: Spacing.lg,
+    marginVertical: Spacing.md,
   },
   bodyRow: {
     flexDirection: 'row',
@@ -189,17 +195,20 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
   },
+  // marginTop auto pins the block to the bottom; the marginBottom is what
+  // keeps the last chip row off the card's edge instead of touching it.
   chips: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: Spacing.sm,
     marginTop: 'auto',
+    marginBottom: Spacing.xs,
   },
   chip: {
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: Radius.pill,
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs + 2,
+    paddingVertical: Spacing.xs + 1,
   },
   chipText: {
     ...Typography.micro,
@@ -209,6 +218,6 @@ const styles = StyleSheet.create({
     ...Typography.micro,
     fontWeight: '600',
     alignSelf: 'flex-end',
-    marginTop: Spacing.sm,
+    marginTop: Spacing.xs,
   },
 });
