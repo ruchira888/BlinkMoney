@@ -73,7 +73,7 @@ export const Duration = {
   base: 260,
   slow: 420,
   /** How long a promo card rests before the carousel advances. */
-  carouselDwell: 1000,
+  carouselDwell: 1500,
   /** The slide itself. */
   carouselSlide: 520,
   /** Idle time after a manual swipe before auto-advance resumes, so the
@@ -115,50 +115,48 @@ export type PromoTone = {
  * previously dragged the ink down with the background and left the amber
  * card's footnote at roughly 1.6:1, which is unreadable.
  *
- * Every gradient here is dark enough that near-white ink clears 4.5:1 against
- * its lighter end, so one set of inks is legible on all three cards.
+ * Every ink here is pure #FFFFFF. Tinted off-whites were what made the type
+ * read as faded -- at these sizes the tint is not perceived as colour, only as
+ * a loss of crispness. Hierarchy comes from size and weight instead, which is
+ * why inkMuted is also white rather than a dimmer shade.
+ *
+ * Every gradient is dark enough that pure white clears 4.5:1 against its
+ * lighter end, measured with the decorative bloom blended on top -- the bloom
+ * lightens the ground, so ignoring it overstates the real contrast.
  */
 export const PROMO_TONES = {
   green: {
     from: '#157A38',
     to: '#06451C',
     glow: '#3FCB75',
-    ink: '#F1FBF4',
+    ink: '#FFFFFF',
     inkStrong: '#FFFFFF',
-    inkMuted: '#DCF0E3',
-    chipBorder: '#5FD98C',
-    chipInk: '#F1FBF4',
+    inkMuted: '#FFFFFF',
+    chipBorder: '#7FE5A5',
+    chipInk: '#FFFFFF',
   },
-  // The one card that runs dark ink on a light ground.
-  //
-  // It was near-white ink on a deep burnt orange, which measured fine but read
-  // as washed out -- white on orange is low-chroma-contrast even when the
-  // luminance ratio passes. Inverting it lets the card be properly orange and
-  // the type properly legible at the same time.
-  //
-  // That inverts which end of the gradient is the worst case: with dark ink it
-  // is the *darkest* stop, #F58B1E, not the lightest. Every value below is
-  // solved against that. The bloom only lightens the ground, so it moves
-  // contrast in the safe direction here.
+  // Brighter than it was, and it can afford to be: the bloom that used to sit
+  // over it at 0.3 opacity was washing every card out, and dropping that to
+  // 0.08 bought back more contrast than darkening the orange ever did.
   amber: {
-    from: '#FFB84D',
-    to: '#F58B1E',
-    glow: '#FFD98A',
-    ink: '#4A260D',
-    inkStrong: '#3A1D08',
-    inkMuted: '#5A3010',
-    chipBorder: '#7A400F',
-    chipInk: '#4A260D',
+    from: '#B05C11',
+    to: '#7A3C0A',
+    glow: '#E8912B',
+    ink: '#FFFFFF',
+    inkStrong: '#FFFFFF',
+    inkMuted: '#FFFFFF',
+    chipBorder: '#FFD5A8',
+    chipInk: '#FFFFFF',
   },
   blue: {
     from: '#2570BC',
     to: '#0E3D7E',
     glow: '#5AA6E8',
-    ink: '#EFF6FE',
+    ink: '#FFFFFF',
     inkStrong: '#FFFFFF',
-    inkMuted: '#EDF4FE',
-    chipBorder: '#A3CFF5',
-    chipInk: '#EFF6FE',
+    inkMuted: '#FFFFFF',
+    chipBorder: '#B8DBF8',
+    chipInk: '#FFFFFF',
   },
 } as const satisfies Record<string, PromoTone>;
 

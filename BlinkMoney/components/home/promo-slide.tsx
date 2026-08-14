@@ -48,10 +48,13 @@ function PromoSlideComponent({
   const animatedStyle = useAnimatedStyle(() => {
     const inputRange = [(index - 1) * slideWidth, index * slideWidth, (index + 1) * slideWidth];
 
+    // Scale only. Neighbours used to fade to 0.55 opacity, which meant that on
+    // a short dwell -- when the carousel is nearly always mid-transition -- the
+    // card on screen was usually part-faded and its copy looked washed out.
+    // Depth now comes from scale alone, so the type is always at full strength.
     const scale = interpolate(scrollX.value, inputRange, [0.93, 1, 0.93], Extrapolation.CLAMP);
-    const opacity = interpolate(scrollX.value, inputRange, [0.55, 1, 0.55], Extrapolation.CLAMP);
 
-    return { transform: [{ scale }], opacity };
+    return { transform: [{ scale }] };
   });
 
   return (

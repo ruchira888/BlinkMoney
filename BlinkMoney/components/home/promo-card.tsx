@@ -53,10 +53,11 @@ function PromoCardComponent({ promo, width, colors, onPress }: Props) {
             <Stop offset="1" stopColor={tone.to} />
           </LinearGradient>
           <RadialGradient id={`glow-${promo.id}`} cx="0.5" cy="0.5" r="0.5">
-            {/* Kept low on purpose: the ink contrast above is solved against
-                the gradient's lighter end, and a strong bloom would lift the
-                background past that and undo it. */}
-            <Stop offset="0" stopColor={tone.glow} stopOpacity={0.3} />
+            {/* 0.08, not 0.3. The bloom lightens the ground under white type,
+                and at 0.3 it dragged every card under 4.5:1 no matter how deep
+                the gradient was. This is the single value that decides whether
+                the copy reads as crisp or washed out. */}
+            <Stop offset="0" stopColor={tone.glow} stopOpacity={0.08} />
             <Stop offset="1" stopColor={tone.glow} stopOpacity={0} />
           </RadialGradient>
         </Defs>
@@ -131,6 +132,7 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     ...Typography.caption,
+    fontWeight: '700',
     marginBottom: Spacing.xs,
   },
   title: {
@@ -152,6 +154,7 @@ const styles = StyleSheet.create({
   },
   body: {
     ...Typography.body,
+    fontWeight: '600',
     flex: 1,
   },
   stat: {
@@ -163,6 +166,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     ...Typography.micro,
+    fontWeight: '700',
     textAlign: 'center',
   },
   chips: {
@@ -179,9 +183,11 @@ const styles = StyleSheet.create({
   },
   chipText: {
     ...Typography.micro,
+    fontWeight: '700',
   },
   footnote: {
     ...Typography.micro,
+    fontWeight: '600',
     alignSelf: 'flex-end',
     marginTop: Spacing.sm,
   },
