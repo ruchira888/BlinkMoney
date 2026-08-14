@@ -73,7 +73,7 @@ export const Duration = {
   base: 260,
   slow: 420,
   /** How long a promo card rests before the carousel advances. */
-  carouselDwell: 2400,
+  carouselDwell: 1000,
   /** The slide itself. */
   carouselSlide: 520,
   /** Idle time after a manual swipe before auto-advance resumes, so the
