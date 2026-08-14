@@ -31,7 +31,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { CarouselDots } from '@/components/home/carousel-dots';
-import { PROMO_CARD_HEIGHT } from '@/components/home/promo-card';
+import { promoCardHeight } from '@/components/home/promo-card';
 import { PromoSlide } from '@/components/home/promo-slide';
 import type { Promo } from '@/constants/promos';
 import { Duration, Spacing, type ThemePalette } from '@/constants/theme';
@@ -144,8 +144,10 @@ export function PromoCarousel({ promos, colors, onSelect, onActiveChange }: Prop
         onScrollBeginDrag={handleTouchStart}
         onMomentumScrollEnd={handleMomentumEnd}
         onScrollEndDrag={scheduleResume}
-        // Height is pinned so the strip does not grow with the scaled slides.
-        style={{ height: PROMO_CARD_HEIGHT }}
+        // Pinned so the strip does not grow with the scaled slides, plus a
+        // little slack so an active card at full scale is not flush against
+        // the strip's own edges.
+        style={{ height: promoCardHeight(cardWidth) + Spacing.sm }}
         accessibilityRole="list"
         accessibilityLabel="Offers"
       >

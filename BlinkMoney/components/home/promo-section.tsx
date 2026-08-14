@@ -10,10 +10,10 @@
  * states never shifts the content below it.
  */
 
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { PromoCarousel } from '@/components/home/promo-carousel';
-import { PROMO_CARD_HEIGHT } from '@/components/home/promo-card';
+import { promoCardHeight } from '@/components/home/promo-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StateMessage } from '@/components/ui/state-message';
 import type { Promo } from '@/constants/promos';
@@ -29,11 +29,16 @@ type Props = {
 };
 
 export function PromoSection({ state, retry, colors, onSelect, onActiveChange }: Props) {
+  const { width } = useWindowDimensions();
+  // The same maths the carousel uses, so every state reserves exactly the
+  // height the real card will take and nothing below shifts between them.
+  const cardHeight = promoCardHeight(Math.max(0, width - Spacing.xl * 2));
+
   switch (state.status) {
     case 'loading':
       return (
         <View style={styles.gutter}>
-          <Skeleton height={PROMO_CARD_HEIGHT} radius={Radius.xl} colors={colors} />
+          <Skeleton height={cardHeight} radius={Radius.xl} colors={colors} />
           <View style={styles.dotRow}>
             <Skeleton width={28} height={8} radius={Radius.pill} colors={colors} />
             <Skeleton width={8} height={8} radius={Radius.pill} colors={colors} />
@@ -50,7 +55,7 @@ export function PromoSection({ state, retry, colors, onSelect, onActiveChange }:
             title="No offers right now"
             description="New ways to grow your money land here often. Check back shortly."
             colors={colors}
-            minHeight={PROMO_CARD_HEIGHT}
+            minHeight={cardHeight}
           />
         </View>
       );
@@ -64,7 +69,7 @@ export function PromoSection({ state, retry, colors, onSelect, onActiveChange }:
             description={state.message}
             colors={colors}
             onRetry={retry}
-            minHeight={PROMO_CARD_HEIGHT}
+            minHeight={cardHeight}
           />
         </View>
       );

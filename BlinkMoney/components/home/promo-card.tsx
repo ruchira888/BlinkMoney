@@ -20,14 +20,40 @@
 
 import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Svg, { Circle, Defs, LinearGradient, RadialGradient, Rect, Stop } from 'react-native-svg';
+import Svg, {
+  Circle,
+  ClipPath,
+  Defs,
+  G,
+  LinearGradient,
+  RadialGradient,
+  Rect,
+  Stop,
+} from 'react-native-svg';
 
 import type { Promo } from '@/constants/promos';
 import { Glass, Radius, Spacing, Typography, type ThemePalette } from '@/constants/theme';
 
-/** Fixed so every slide is the same height and the carousel never reflows as
- *  it advances between cards with different amounts of copy. */
-export const PROMO_CARD_HEIGHT = 284;
+/**
+ * Height is derived from width, not fixed.
+ *
+ * A hardcoded height meant the aspect ratio changed on every device -- tall
+ * and narrow on a small phone, short and wide on a large one -- and the strip
+ * reserved exactly that height, so there was no tolerance for a long string or
+ * a large system font before the card clipped.
+ *
+ * The floor keeps the tallest card's content (~271px) fitting on a narrow
+ * phone; the ceiling stops it becoming a slab on a tablet.
+ */
+const CARD_RATIO = 0.78;
+const MIN_CARD_HEIGHT = 280;
+const MAX_CARD_HEIGHT = 320;
+
+export function promoCardHeight(cardWidth: number): number {
+  return Math.round(
+    Math.min(MAX_CARD_HEIGHT, Math.max(MIN_CARD_HEIGHT, cardWidth * CARD_RATIO))
+  );
+}
 
 type Props = {
   promo: Promo;
@@ -38,7 +64,7 @@ type Props = {
 
 function PromoCardComponent({ promo, width, colors, onPress }: Props) {
   const tone = colors.promo[promo.tone];
-  const h = PROMO_CARD_HEIGHT;
+  const h = promoCardHeight(width);
 
   return (
     <Pressable
@@ -74,31 +100,63 @@ function PromoCardComponent({ promo, width, colors, onPress }: Props) {
             <Stop offset="0.34" stopColor={Glass.white} stopOpacity={Glass.sheenFade} />
             <Stop offset="1" stopColor={Glass.white} stopOpacity={0} />
           </LinearGradient>
+          {/* The card's own silhouette. Everything decorative is drawn inside
+              this, because svg does not clip to the parent View's rounded
+              corners -- the rings reach ~1.03x the card width and would
+              otherwise paint out over the corner. */}
+          <ClipPath id={`clip-${promo.id}`}>
+            <Rect x={0} y={0} width={width} height={h} rx={Radius.xl} ry={Radius.xl} />
+          </ClipPath>
         </Defs>
 
-        <Rect x={0} y={0} width={width} height={h} fill={`url(#fill-${promo.id})`} />
-        <Circle cx={width * 0.86} cy={h * 0.2} r={width * 0.42} fill={`url(#glow-${promo.id})`} />
-
-        {/* The motif. Lit by the bloom above so they read as glass rather than
-            as outlines. Top-right, clear of the left-aligned headline. */}
-        <Circle
-          cx={width * 0.85}
-          cy={h * 0.23}
-          r={width * 0.16}
-          fill="none"
-          stroke={Glass.ring}
-          strokeWidth={width * 0.05}
+        {/* rx/ry, not just the parent's borderRadius: Android does not
+            reliably clip a native child view -- which is what an svg surface
+            is -- to a parent's rounded corners, so the artwork has to carry
+            its own rounding or the card renders as a square. */}
+        <Rect
+          x={0}
+          y={0}
+          width={width}
+          height={h}
+          rx={Radius.xl}
+          ry={Radius.xl}
+          fill={`url(#fill-${promo.id})`}
         />
-        <Circle
-          cx={width * 0.75}
-          cy={h * 0.38}
-          r={width * 0.09}
-          fill="none"
-          stroke={Glass.ringSoft}
-          strokeWidth={width * 0.032}
-        />
+        <G clipPath={`url(#clip-${promo.id})`}>
+          <Circle cx={width * 0.86} cy={h * 0.2} r={width * 0.42} fill={`url(#glow-${promo.id})`} />
 
-        <Rect x={0} y={0} width={width} height={h} fill={`url(#sheen-${promo.id})`} />
+          {/* The motif. Lit by the bloom above so the rings read as glass
+              rather than as outlines. Top-right, clear of the left-aligned
+              headline, and deliberately running off the edge -- clipped, so it
+              reads as a shape passing behind the card rather than a circle
+              floating on it. */}
+          <Circle
+            cx={width * 0.85}
+            cy={h * 0.23}
+            r={width * 0.16}
+            fill="none"
+            stroke={Glass.ring}
+            strokeWidth={width * 0.05}
+          />
+          <Circle
+            cx={width * 0.75}
+            cy={h * 0.38}
+            r={width * 0.09}
+            fill="none"
+            stroke={Glass.ringSoft}
+            strokeWidth={width * 0.032}
+          />
+
+          <Rect
+            x={0}
+            y={0}
+            width={width}
+            height={h}
+            rx={Radius.xl}
+            ry={Radius.xl}
+            fill={`url(#sheen-${promo.id})`}
+          />
+        </G>
       </Svg>
 
       <View style={styles.content}>
@@ -114,22 +172,34 @@ function PromoCardComponent({ promo, width, colors, onPress }: Props) {
           </Text>
         ) : null}
 
-        <Text style={[styles.title, { color: tone.inkStrong }]} numberOfLines={2}>
+        <Text
+          style={[styles.title, { color: tone.inkStrong }]}
+          numberOfLines={2}
+          maxFontSizeMultiplier={1.2}
+        >
           {promo.title}
         </Text>
         {promo.titleAccent ? (
-          <Text style={[styles.titleAccent, { color: tone.ink }]} numberOfLines={2}>
+          <Text
+            style={[styles.titleAccent, { color: tone.ink }]}
+            numberOfLines={2}
+            maxFontSizeMultiplier={1.2}
+          >
             {promo.titleAccent}
           </Text>
         ) : null}
 
         <View style={styles.bodyRow}>
-          <Text style={[styles.body, { color: tone.ink }]} numberOfLines={3}>
+          <Text
+            style={[styles.body, { color: tone.ink }]}
+            numberOfLines={3}
+            maxFontSizeMultiplier={1.2}
+          >
             {promo.body}
           </Text>
           {promo.stat ? (
             <View style={styles.stat}>
-              <Text style={[styles.statValue, { color: tone.inkStrong }]}>{promo.stat.value}</Text>
+              <Text style={[styles.statValue, { color: tone.inkStrong }]} maxFontSizeMultiplier={1.2}>{promo.stat.value}</Text>
               <Text style={[styles.statLabel, { color: tone.inkMuted }]} numberOfLines={2}>
                 {promo.stat.label}
               </Text>
