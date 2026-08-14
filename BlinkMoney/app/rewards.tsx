@@ -1,17 +1,13 @@
 /**
- * Rewards.
+ * Rewards — the entry point for Gift a Seed.
  *
- * Gift a Seed lives inside the existing Rewards section rather than beside it.
- * The GIFTED tab is selected by default when a seed gift is waiting; the
- * app's existing reward categories keep their place underneath.
+ * Points balance, the three earn/redeem/history tabs, the Gift a Seed call to
+ * action, and a summary of gifts already sent. Gifting lives inside Rewards
+ * rather than beside it, so the loop is send → they grow → you both earn.
  *
  * Styles come from a makeStyles factory memoised on the palette. A module-level
- * StyleSheet.create would bake in whichever theme was active at import, which
- * is why this screen previously stayed dark when the toggle was flipped.
- *
- * It now uses the themed BottomNav from components/home rather than the
- * gift-seed one, so there is a single nav bar in the app instead of two that
- * have to be kept in sync.
+ * StyleSheet.create bakes in whichever theme was active at import and never
+ * repaints.
  */
 
 import { Ionicons } from '@expo/vector-icons';
@@ -22,33 +18,30 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BottomNav, type NavItem } from '@/components/home/bottom-nav';
-import { GIFT } from '@/components/gift-seed/gift';
+import {
+  EARN_ACTIONS,
+  HISTORY,
+  REDEEM_OPTIONS,
+  REWARDS_SUMMARY,
+  REWARD_TABS,
+  type RewardTab,
+} from '@/components/rewards/rewards-data';
 import { PressableScale } from '@/components/ui/pressable-scale';
 import { ScreenHeader } from '@/components/ui/screen-header';
-import { Radius, Spacing, Typography, type ThemePalette } from '@/constants/theme';
+import { SegmentedControl, type SegmentOption } from '@/components/ui/segmented-control';
+import { Radius, Spacing, Typography, elevation, type ThemePalette } from '@/constants/theme';
 import { useTheme } from '@/providers/theme-provider';
-
-type Tab = 'GIFTED' | 'EARNED';
-
-const TABS: Tab[] = ['GIFTED', 'EARNED'];
-
-const CATEGORIES: {
-  icon: keyof typeof Ionicons.glyphMap;
-  title: string;
-  body: string;
-}[] = [
-  { icon: 'people-outline', title: 'Refer & Earn', body: 'Invite friends, grow together.' },
-  { icon: 'flame-outline', title: 'Streak Rewards', body: 'Keep investing, earn more.' },
-  { icon: 'ribbon-outline', title: 'Milestone Rewards', body: 'Unlock as you grow.' },
-];
 
 /** Clears the floating nav bar. */
 const SCROLL_BOTTOM_PADDING = 108;
 
+const TAB_OPTIONS: SegmentOption<RewardTab>[] = REWARD_TABS.map((value) => ({
+  value,
+  label: value,
+}));
+
 export default function RewardsScreen() {
-  // GIFTED is the default because a seed gift is waiting; without one, EARNED
-  // would be the sensible landing tab.
-  const [tab, setTab] = useState<Tab>('GIFTED');
+  const [tab, setTab] = useState<RewardTab>('Earn');
   const { colors, scheme, isDark } = useTheme();
   const s = useMemo(() => makeStyles(colors), [colors]);
 
@@ -64,82 +57,130 @@ export default function RewardsScreen() {
       <StatusBar style={isDark ? 'light' : 'dark'} />
 
       <ScreenHeader
-        title="Your Rewards"
-        subtitle="Good things grow here."
+        title="Rewards"
+        subtitle="Small steps. Bigger future."
         colors={colors}
         onBack={() => router.replace('/')}
       />
 
       <ScrollView contentContainerStyle={s.body} showsVerticalScrollIndicator={false}>
-        <View style={s.tabs}>
-          {TABS.map((t) => {
-            const on = t === tab;
-            return (
-              <PressableScale
-                key={t}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: on }}
-                accessibilityLabel={t}
-                onPress={() => setTab(t)}
-                haptic
-                style={[s.tab, on && s.tabActive]}
-              >
-                <Text style={[s.tabText, on && s.tabTextActive]}>{t}</Text>
-              </PressableScale>
-            );
-          })}
+        <View style={[s.balance, elevation(scheme, 2)]}>
+          <View style={s.balanceIcon}>
+            <Ionicons name="sparkles" size={22} color={colors.accentInk} />
+          </View>
+          <View style={s.balanceText}>
+            <Text style={s.balanceLabel}>Your points</Text>
+            <Text style={s.balanceValue}>{REWARDS_SUMMARY.points.toLocaleString('en-IN')}</Text>
+          </View>
+          <Text style={s.balanceHint}>Keep investing.{'\n'}Earn more.</Text>
         </View>
 
-        {tab === 'GIFTED' ? (
-          <PressableScale
-            accessibilityRole="button"
-            accessibilityLabel={`Gift a Seed, ${GIFT.amountLabel}, gifted by ${GIFT.sender}`}
-            onPress={() => router.push('/gift')}
-            haptic
-            style={s.gifted}
-          >
-            <View style={s.giftedTop}>
-              <View style={s.giftedIcon}>
-                <Ionicons name="gift-outline" size={20} color={colors.accentInk} />
-              </View>
-              <View style={s.giftedText}>
-                <Text style={s.giftedAmount}>{GIFT.amountLabel}</Text>
-                <Text style={s.giftedTitle}>Gift a Seed</Text>
-                <Text style={s.giftedBy}>Gifted by {GIFT.sender}</Text>
-              </View>
-              <View style={s.status}>
-                <Text style={s.statusText}>Invested</Text>
-              </View>
-            </View>
-            <View style={s.giftedFoot}>
-              <Text style={s.giftedFootText}>Open your envelope</Text>
-              <Ionicons name="chevron-forward" size={15} color={colors.textMuted} />
-            </View>
-          </PressableScale>
-        ) : (
-          <View style={s.empty}>
-            <Text style={s.emptyText}>Rewards you earn by investing will appear here.</Text>
-          </View>
-        )}
+        <SegmentedControl
+          options={TAB_OPTIONS}
+          value={tab}
+          onChange={setTab}
+          colors={colors}
+          accessibilityLabel="Rewards sections"
+        />
 
-        <Text style={s.sectionLabel}>More ways to grow</Text>
-        {CATEGORIES.map((category) => (
-          <PressableScale
-            key={category.title}
-            accessibilityRole="button"
-            accessibilityLabel={category.title}
-            style={s.row}
-          >
-            <View style={s.rowIcon}>
-              <Ionicons name={category.icon} size={19} color={colors.textMuted} />
-            </View>
-            <View style={s.rowText}>
-              <Text style={s.rowTitle}>{category.title}</Text>
-              <Text style={s.rowBody}>{category.body}</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={16} color={colors.textFaint} />
-          </PressableScale>
-        ))}
+        {tab === 'Earn'
+          ? EARN_ACTIONS.map((action) => (
+              <View key={action.id} style={s.row}>
+                <View style={s.rowIcon}>
+                  <Ionicons name={action.icon as never} size={19} color={colors.accentInk} />
+                </View>
+                <View style={s.rowText}>
+                  <Text style={s.rowTitle}>{action.title}</Text>
+                  <Text style={s.rowBody}>{action.body}</Text>
+                </View>
+                {action.done ? (
+                  <View style={s.done}>
+                    <Ionicons name="checkmark" size={14} color={colors.accentInk} />
+                  </View>
+                ) : (
+                  <Text style={s.points}>+{action.points}</Text>
+                )}
+              </View>
+            ))
+          : null}
+
+        {tab === 'Redeem'
+          ? REDEEM_OPTIONS.map((option) => {
+              const affordable = REWARDS_SUMMARY.points >= option.cost;
+              return (
+                <PressableScale
+                  key={option.id}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${option.title}, ${option.cost} points`}
+                  accessibilityState={{ disabled: !affordable }}
+                  disabled={!affordable}
+                  haptic={affordable}
+                  style={[s.row, !affordable && s.rowDim]}
+                >
+                  <View style={s.rowIcon}>
+                    <Ionicons name={option.icon as never} size={19} color={colors.accentInk} />
+                  </View>
+                  <View style={s.rowText}>
+                    <Text style={s.rowTitle}>{option.title}</Text>
+                    <Text style={s.rowBody}>
+                      {affordable ? option.body : `Need ${option.cost - REWARDS_SUMMARY.points} more`}
+                    </Text>
+                  </View>
+                  <Text style={s.points}>{option.cost}</Text>
+                </PressableScale>
+              );
+            })
+          : null}
+
+        {tab === 'History'
+          ? HISTORY.map((entry) => (
+              <View key={entry.id} style={s.row}>
+                <View style={s.rowText}>
+                  <Text style={s.rowTitle}>{entry.title}</Text>
+                  <Text style={s.rowBody}>{entry.when}</Text>
+                </View>
+                <Text style={[s.points, entry.delta < 0 && s.pointsSpent]}>
+                  {entry.delta > 0 ? `+${entry.delta}` : entry.delta}
+                </Text>
+              </View>
+            ))
+          : null}
+
+        <Text style={s.sectionLabel}>Give someone a head start</Text>
+
+        <PressableScale
+          accessibilityRole="button"
+          accessibilityLabel="Gift a Seed"
+          accessibilityHint="Send someone a gift that gets invested"
+          onPress={() => router.push('/gift-send/card')}
+          haptic
+          style={[s.gift, elevation(scheme, 2)]}
+        >
+          <View style={s.giftIcon}>
+            <Ionicons name="gift" size={22} color={colors.onAccent} />
+          </View>
+          <View style={s.rowText}>
+            <Text style={s.giftTitle}>Gift a Seed</Text>
+            <Text style={s.giftBody}>Send ₹51 and up. They claim it, it starts growing.</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.accentInk} />
+        </PressableScale>
+
+        <Text style={s.sectionLabel}>Your gifts</Text>
+        <View style={s.stats}>
+          <View style={s.stat}>
+            <Text style={s.statValue}>{REWARDS_SUMMARY.giftsSent}</Text>
+            <Text style={s.statLabel}>Sent</Text>
+          </View>
+          <View style={s.stat}>
+            <Text style={s.statValue}>{REWARDS_SUMMARY.giftsOpened}</Text>
+            <Text style={s.statLabel}>Opened</Text>
+          </View>
+          <View style={s.stat}>
+            <Text style={s.statValue}>{REWARDS_SUMMARY.giftsGrowing}</Text>
+            <Text style={s.statLabel}>Growing</Text>
+          </View>
+        </View>
 
         <View style={{ height: SCROLL_BOTTOM_PADDING }} />
       </ScrollView>
@@ -158,89 +199,29 @@ function makeStyles(colors: ThemePalette) {
       gap: Spacing.md,
     },
 
-    tabs: {
+    balance: {
       flexDirection: 'row',
-      backgroundColor: colors.surfaceSunken,
-      borderRadius: Radius.md,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.border,
-      padding: Spacing.xs,
-      gap: Spacing.xs,
-    },
-    tab: {
-      flex: 1,
-      height: 38,
-      borderRadius: Radius.sm,
       alignItems: 'center',
-      justifyContent: 'center',
-    },
-    tabActive: { backgroundColor: colors.accent },
-    tabText: {
-      ...Typography.micro,
-      color: colors.textMuted,
-      fontWeight: '700',
-      letterSpacing: 1.2,
-    },
-    tabTextActive: { color: colors.onAccent },
-
-    gifted: {
-      backgroundColor: colors.surface,
-      borderRadius: Radius.lg,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.accent,
-      padding: Spacing.lg,
       gap: Spacing.md,
+      backgroundColor: colors.surface,
+      borderRadius: Radius.xl,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.accent,
+      padding: Spacing.xl,
     },
-    giftedTop: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.md },
-    giftedIcon: {
-      width: 42,
-      height: 42,
-      borderRadius: Radius.sm,
+    balanceIcon: {
+      width: 46,
+      height: 46,
+      borderRadius: Radius.pill,
       backgroundColor: colors.accentWash,
       alignItems: 'center',
       justifyContent: 'center',
     },
-    giftedText: { flex: 1, gap: 1 },
-    giftedAmount: { ...Typography.title, color: colors.text },
-    giftedTitle: { ...Typography.bodyStrong, color: colors.text },
-    giftedBy: { ...Typography.caption, color: colors.textMuted },
-    status: {
-      backgroundColor: colors.accentWash,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.accent,
-      borderRadius: Radius.pill,
-      paddingHorizontal: Spacing.sm,
-      paddingVertical: Spacing.xs,
-    },
-    statusText: { ...Typography.micro, color: colors.accentInk, fontWeight: '700' },
-    giftedFoot: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: colors.border,
-      paddingTop: Spacing.sm,
-    },
-    giftedFootText: { ...Typography.caption, color: colors.textMuted, fontWeight: '600' },
+    balanceText: { flex: 1 },
+    balanceLabel: { ...Typography.caption, color: colors.textMuted },
+    balanceValue: { ...Typography.display, color: colors.text },
+    balanceHint: { ...Typography.micro, color: colors.textFaint, textAlign: 'right' },
 
-    empty: {
-      backgroundColor: colors.surface,
-      borderRadius: Radius.lg,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.border,
-      padding: Spacing.xxl,
-      alignItems: 'center',
-    },
-    emptyText: { ...Typography.caption, color: colors.textMuted, textAlign: 'center' },
-
-    sectionLabel: {
-      ...Typography.micro,
-      color: colors.textFaint,
-      letterSpacing: 1.2,
-      textTransform: 'uppercase',
-      marginTop: Spacing.sm,
-      marginLeft: Spacing.xxs,
-    },
     row: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -249,8 +230,9 @@ function makeStyles(colors: ThemePalette) {
       borderRadius: Radius.lg,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: colors.border,
-      padding: Spacing.md,
+      padding: Spacing.lg,
     },
+    rowDim: { opacity: 0.55 },
     rowIcon: {
       width: 38,
       height: 38,
@@ -262,5 +244,59 @@ function makeStyles(colors: ThemePalette) {
     rowText: { flex: 1, gap: Spacing.xxs },
     rowTitle: { ...Typography.bodyStrong, color: colors.text },
     rowBody: { ...Typography.caption, color: colors.textMuted },
+    points: { ...Typography.bodyStrong, color: colors.accentInk },
+    pointsSpent: { color: colors.textFaint },
+    done: {
+      width: 26,
+      height: 26,
+      borderRadius: Radius.pill,
+      backgroundColor: colors.accentWash,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+
+    sectionLabel: {
+      ...Typography.micro,
+      color: colors.textFaint,
+      letterSpacing: 1.2,
+      textTransform: 'uppercase',
+      marginTop: Spacing.md,
+      marginLeft: Spacing.xxs,
+    },
+
+    gift: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: Spacing.md,
+      backgroundColor: colors.surface,
+      borderRadius: Radius.xl,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.accent,
+      padding: Spacing.lg,
+    },
+    giftIcon: {
+      width: 46,
+      height: 46,
+      borderRadius: Radius.pill,
+      backgroundColor: colors.accent,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    giftTitle: { ...Typography.subheading, color: colors.text },
+    giftBody: { ...Typography.caption, color: colors.textMuted },
+
+    stats: { flexDirection: 'row', gap: Spacing.md },
+    stat: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      borderRadius: Radius.lg,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+      paddingVertical: Spacing.lg,
+      alignItems: 'center',
+      gap: Spacing.xxs,
+    },
+    statValue: { ...Typography.title, color: colors.text },
+    statLabel: { ...Typography.micro, color: colors.textMuted },
   });
 }

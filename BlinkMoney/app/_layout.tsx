@@ -55,6 +55,8 @@ function ThemedApp() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="notifications" options={{ headerShown: false }} />
         <Stack.Screen name="rewards" options={{ headerShown: false }} />
+        {/* The send flow. Its own layout owns the draft and the inner Stack. */}
+        <Stack.Screen name="gift-send" options={{ headerShown: false }} />
         {/* The Gift a Seed flow. All headerless -- each screen draws its own
             top bar so the chrome matches the rest of the app. */}
         <Stack.Screen name="gift" options={{ headerShown: false, animation: 'fade' }} />
