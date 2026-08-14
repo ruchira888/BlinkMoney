@@ -129,19 +129,26 @@ export const PROMO_TONES = {
     chipBorder: '#5FD98C',
     chipInk: '#F1FBF4',
   },
-  // Deeper than the mock's swatch, and not negotiable: at #DE7C16 even pure
-  // white lands at 3.0:1, so the footnote on this card cannot be read. The
-  // lighter gradient end has to sit near L=0.15 for near-white ink to clear
-  // 4.5:1, which is what these values are solved for.
+  // The one card that runs dark ink on a light ground.
+  //
+  // It was near-white ink on a deep burnt orange, which measured fine but read
+  // as washed out -- white on orange is low-chroma-contrast even when the
+  // luminance ratio passes. Inverting it lets the card be properly orange and
+  // the type properly legible at the same time.
+  //
+  // That inverts which end of the gradient is the worst case: with dark ink it
+  // is the *darkest* stop, #F58B1E, not the lightest. Every value below is
+  // solved against that. The bloom only lightens the ground, so it moves
+  // contrast in the safe direction here.
   amber: {
-    from: '#A85510',
-    to: '#6E340A',
-    glow: '#E8912B',
-    ink: '#FFF6EC',
-    inkStrong: '#FFFFFF',
-    inkMuted: '#FFF0E0',
-    chipBorder: '#F7C58F',
-    chipInk: '#FFF6EC',
+    from: '#FFB84D',
+    to: '#F58B1E',
+    glow: '#FFD98A',
+    ink: '#4A260D',
+    inkStrong: '#3A1D08',
+    inkMuted: '#5A3010',
+    chipBorder: '#7A400F',
+    chipInk: '#4A260D',
   },
   blue: {
     from: '#2570BC',
