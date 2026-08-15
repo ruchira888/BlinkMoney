@@ -51,7 +51,9 @@ export const PROMOS: Promo[] = [
     eyebrow: 'Stocks + FD + Gold',
     title: 'All in one click',
     titleAccent: 'SIP',
-    body: 'No fund picking. We spread it across assets for you.',
+    // Short enough to sit in the two lines the card gives it. The longer
+    // version ran to a third line and truncated mid-word.
+    body: 'No fund picking. We spread it for you.',
     stat: { value: '~15%', label: 'p.a. returns' },
     // Two, not three. A third wrapped to a second row and left the block
     // cramped against the card's bottom edge; the dropped claim is the

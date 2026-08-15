@@ -21,7 +21,7 @@ import Animated, {
 
 import { PromoCard } from '@/components/home/promo-card';
 import type { Promo } from '@/constants/promos';
-import type { ThemePalette } from '@/constants/theme';
+import { Spacing, type ThemePalette } from '@/constants/theme';
 
 type Props = {
   promo: Promo;
@@ -58,8 +58,13 @@ function PromoSlideComponent({
   });
 
   return (
+    // The gutter is padding on the page, not a centring rule. Centring only
+    // lands the card in the middle if the card is narrower than the page; if
+    // that maths is ever off the card drifts sideways and hangs off an edge.
+    // Padding pins it to a known distance from the page's own left edge and
+    // caps how wide it is allowed to be, which cannot drift.
     <View style={[styles.slide, { width: slideWidth }]}>
-      <Animated.View style={animatedStyle}>
+      <Animated.View style={[styles.cardWrap, animatedStyle]}>
         <PromoCard promo={promo} width={cardWidth} colors={colors} onPress={onPress} />
       </Animated.View>
     </View>
@@ -70,7 +75,11 @@ export const PromoSlide = memo(PromoSlideComponent);
 
 const styles = StyleSheet.create({
   slide: {
-    alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: Spacing.xl,
+  },
+  cardWrap: {
+    // Never wider than the page allows, whatever cardWidth says.
+    maxWidth: '100%',
   },
 });
