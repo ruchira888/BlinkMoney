@@ -9,9 +9,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
+      "bundleIdentifier": "com.blinkmoney.app",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.blinkmoney.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -43,6 +45,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "77904b39-c9b3-4a1c-8785-ad423be382a6"
+      }
+    },
+    "owner": "ruchirapatil"
   }
 }
